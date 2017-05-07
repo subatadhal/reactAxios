@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/subatadhal/reactAxios#readme",
   "dependencies": {
+    "axios": "^0.15.3",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "babel-core": "^6.24.1",
