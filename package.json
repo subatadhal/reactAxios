@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/subatadhal/reactAxios/issues"
   },
-  "homepage": "https://github.com/subatadhal/reactAxios#readme"
+  "homepage": "https://github.com/subatadhal/reactAxios#readme",
+  "dependencies": {
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
+  }
 }
