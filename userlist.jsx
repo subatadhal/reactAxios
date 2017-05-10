@@ -8,9 +8,11 @@ class UserList extends React.Component {
     this.state = {
       userList: [],
       userDetails: [],
+      message:[],
       viewIsHidden: 'false',
       editIsHidden: 'false',
-      deleteIsHidden: 'false'
+      deleteIsHidden: 'false',
+      messageIsHidden: 'false'
     }
   }
   componentDidMount() {
@@ -37,6 +39,14 @@ class UserList extends React.Component {
          });
     }
   }
+  oncallbackEditView(editMessage){
+    console.log(editMessage);
+    this.setState({
+      message: editMessage,
+      editIsHidden: 'false',
+      messageIsHidden: 'true'
+    });
+  }
   render() {
     const userArr = this.state.userList;
     const listItems = userArr.map((userObj) => {
@@ -46,13 +56,17 @@ class UserList extends React.Component {
       var viewUser = <ViewUserDetails callbackBtnClickType={(btnType) => this.onCallbackBtnClickType(btnType)} datauserdetails={this.state.userDetails}/>
     }
     if(this.state.editIsHidden === "true"){
-      var edituser = <EditIsHidden datauserdetails={this.state.userDetails}/>
+      var edituser = <EditView callbackEditView={(editMessage) => this.oncallbackEditView(editMessage)} datauserdetails={this.state.userDetails}/>
     }
     if(this.state.deleteIsHidden === "true"){
-      var deleteuser = <DeleteIsHidden datauserdetails={this.state.userDetails}/>
+      var deleteuser = <DeleteView datauserdetails={this.state.userDetails}/>
+    }
+    if(this.state.messageIsHidden === "true"){
+      var message = <MessageView messagedetails={this.state.message}/>
     }
     return (
       <div className="row">
+        {message}
         <div className="col-md-6">
           <h2><i className="zmdi zmdi-accounts-alt"></i> User List:</h2>
           <ul className="list-group">
@@ -126,58 +140,82 @@ class ViewUserDetails extends React.Component {
     )
   }
 }
-class EditIsHidden extends React.Component {
+class EditView extends React.Component {
   constructor(props) {
     super(props);
+    this.handlePostClick = this.handlePostClick.bind(this);
   }
   handlePostClick(e){
     e.preventDefault();
+    var _ = this.props;
+    var id = _.datauserdetails.id;
+    var that = this.refs;
 
-    axios.put('http://jsonplaceholder.typicode.com/users/1', {
+    axios.put('http://jsonplaceholder.typicode.com/users/'+id, {
       data: {
-        id: 1,
-        name: 'foo',
-        phone: '9876543210'
+        id: id,
+        username: that.username.value,
+        email: that.useremail.value,
+        website: that.userwebsite.value,
+        phone: that.userphone.value
       }
     }).then(function(data) {
-      console.log(data);
+      if(data.statusText === 'OK'){
+        var reply={
+          type: 'success',
+          msg: 'Row successfully editted'
+        }
+        _.callbackEditView(reply);
+      }else{
+        var reply={
+          type: 'notsuccess',
+          msg: 'Sorry request not success'
+        }
+        _.callbackEditView(reply);
+      }
     });
 
   }
   render() {
     return (
       <div className="col-md-6 ">
-        <form onSubmit={this.handlePostClick}>
+        <form className="form-horizontal" onSubmit={this.handlePostClick}>
           <h3>Edit User</h3>
-          <div className="row">
-            <div className="medium-12 columns">
-              <label>Name
-                <input type="text" placeholder="Title" ref="username"  />
-              </label>
+          <div className="form-group">
+              <label for="" className="col-sm-2 control-label">Name</label>
+              <div className="col-sm-10">
+                <input className="form-control" placeholder="Title" ref="username" defaultValue={this.props.datauserdetails.name}/>
+              </div>
             </div>
-            <div className="medium-12 columns">
-              <label>Email
-                <input type="text" placeholder="Title" ref="useremail" />
-              </label>
+            <div className="form-group">
+              <label for="" className="col-sm-2 control-label">Email</label>
+              <div className="col-sm-10">
+                <input className="form-control" placeholder="Email" ref="useremail" defaultValue={this.props.datauserdetails.email}/>
+              </div>
             </div>
-            <div className="medium-12 columns">
-              <label>Phone
-                <input type="text" placeholder="Title" ref="userphone"  />
-              </label>
+            <div className="form-group">
+              <label for="" className="col-sm-2 control-label">Phone</label>
+              <div className="col-sm-10">
+                <input className="form-control" placeholder="Phone" ref="userphone" defaultValue={this.props.datauserdetails.phone}/>
+              </div>
             </div>
-            <div className="medium-12 columns">
-              <label>Website
-                <input type="text" placeholder="Title" ref="userwebsite" />
-              </label>
+            <div className="form-group">
+              <label for="" className="col-sm-2 control-label">Website</label>
+              <div className="col-sm-10">
+                <input className="form-control" placeholder="Website" ref="userwebsite" defaultValue={this.props.datauserdetails.website}/>
+              </div>
             </div>
-            <input type="submit" className="button" value="Submit"/>
-          </div>
+            <div className="form-group">
+              <div className="col-sm-offset-2">
+                <input type="submit" className="btn btn-success" value="Submit"/>
+              </div>
+            </div>
         </form>
       </div>
     )
   }
 }
-class DeleteIsHidden extends React.Component {
+class DeleteView extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -189,4 +227,35 @@ class DeleteIsHidden extends React.Component {
     )
   }
 }
+class MessageView extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    var that = this.props.messagedetails;
+    var print;
+    var classname;
+    if(that.type==='success'){
+      print = that.msg;
+      classname = 'alert-success'
+    }else if(that.type==='notsuccess'){
+      print = that.msg;
+      classname = 'alert-danger'
+    }
+    var printMsg = "<div className=alert"+classname+">" +print+ "</div>";
+    return (
+      <div className="col-md-12">
+        {printMsg}
+      </div>
+    )
+  }
+}
+
 export default UserList;
+
+// <div className="col-md-12">
+//   <div className="alert alert-success" role="alert">...</div>
+//   <div classNameclassName="alert alert-info" role="alert">...</div>
+//   <div className="alert alert-warning" role="alert">...</div>
+//   <div className="alert alert-danger" role="alert">...</div>
+// </div>
