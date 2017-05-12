@@ -40,11 +40,16 @@ class UserList extends React.Component {
     }
   }
   oncallbackEditView(editMessage){
-    console.log(editMessage);
+    //console.log(editMessage);
     this.setState({
       message: editMessage,
       editIsHidden: 'false',
       messageIsHidden: 'true'
+    });
+  }
+  oncallbackMessage(callbackMessage){
+    this.setState({
+      messageIsHidden: callbackMessage.messageIsHidden,
     });
   }
   render() {
@@ -62,7 +67,7 @@ class UserList extends React.Component {
       var deleteuser = <DeleteView datauserdetails={this.state.userDetails}/>
     }
     if(this.state.messageIsHidden === "true"){
-      var message = <MessageView messagedetails={this.state.message}/>
+      var message = <MessageView callbackMessage={(callbackMessage) => this.oncallbackMessage(callbackMessage)} messagedetails={this.state.message}/>
     }
     return (
       <div className="row">
@@ -230,22 +235,31 @@ class DeleteView extends React.Component {
 class MessageView extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      class: "",
+      msg: ""
+    };
   }
-  render() {
+  componentDidMount() {
     var that = this.props.messagedetails;
-    var print;
     var classname;
     if(that.type==='success'){
-      print = that.msg;
-      classname = 'alert-success'
+      classname = 'alert alert-success'
     }else if(that.type==='notsuccess'){
-      print = that.msg;
-      classname = 'alert-danger'
+      classname = 'alert alert-danger'
     }
-    var printMsg = "<div className=alert"+classname+">" +print+ "</div>";
+    this.setState({ class:classname, msg: that.msg });
+    setTimeout(function() {
+      var returnMessage={
+        messageIsHidden: 'false'
+      }
+      this.props.callbackMessage(returnMessage);
+    }.bind(this), 5000)
+  }
+  render() {
     return (
       <div className="col-md-12">
-        {printMsg}
+        <div className={this.state.class}> {this.state.msg} </div>
       </div>
     )
   }
