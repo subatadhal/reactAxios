@@ -1,2 +1,2 @@
 # reactAxios
-Axios demo project
+Axios demo project with reactJS
