@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import { BrowserRouter as Router, Route, Link, Switch, IndexRoute, HashRouter} from 'react-router-dom';
 
 import UserItems from './components/useritems.jsx';
 import ViewUserDetails from './components/viewuserdetails.jsx';
 import EditView from './components/editview.jsx';
 import MessageView from './components/messageview.jsx';
 import DeleteView from './components/deleteview.jsx';
-
 
 class UserList extends React.Component {
   constructor(props) {
@@ -30,7 +30,10 @@ class UserList extends React.Component {
   onChildUserDetails(newDetails) {
     this.setState({
       userDetails: newDetails,
-      viewIsHidden: 'true'
+      viewIsHidden: 'true',
+      editIsHidden: 'false',
+      deleteIsHidden: 'false',
+      messageIsHidden: 'false'
     });
   }
   onCallbackBtnClickType(btnType){
@@ -47,7 +50,6 @@ class UserList extends React.Component {
     }
   }
   oncallbackEditView(editMessage){
-    //console.log(editMessage);
     this.setState({
       message: editMessage,
       editIsHidden: 'false',
@@ -57,6 +59,13 @@ class UserList extends React.Component {
   oncallbackMessage(callbackMessage){
     this.setState({
       messageIsHidden: callbackMessage.messageIsHidden,
+    });
+  }
+  oncallbackReplyConfirmDelete(callbackMessage){
+    this.setState({
+      deleteIsHidden: 'false',
+      messageIsHidden: 'true',
+      message: callbackMessage
     });
   }
   render() {
@@ -71,7 +80,7 @@ class UserList extends React.Component {
       var edituser = <EditView callbackEditView={(editMessage) => this.oncallbackEditView(editMessage)} datauserdetails={this.state.userDetails}/>
     }
     if(this.state.deleteIsHidden === "true"){
-      var deleteuser = <DeleteView datauserdetails={this.state.userDetails}/>
+      var deleteuser = <DeleteView replyConfirmDelete={(callbackMessage) => this.oncallbackReplyConfirmDelete(callbackMessage)} datauserdetails={this.state.userDetails}/>
     }
     if(this.state.messageIsHidden === "true"){
       var message = <MessageView callbackMessage={(callbackMessage) => this.oncallbackMessage(callbackMessage)} messagedetails={this.state.message}/>
@@ -79,8 +88,11 @@ class UserList extends React.Component {
     return (
       <div className="row">
         {message}
-        <div className="col-md-6">
-          <h2><i className="zmdi zmdi-accounts-alt"></i> User List:</h2>
+        <div className="col-md-12 clearfix" style={{'borderBottom':'1px solid #ddd','marginBottom':'15px'}}>
+          <h2 className="pull-left"><i className="zmdi zmdi-accounts-alt"></i> User List:</h2>
+          <Link to="/addnewuser" style={{'marginTop':'15px'}} className="btn btn-success pull-right"><i className="zmdi zmdi-plus"></i> Add New</Link>
+        </div>
+        <div className="col-md-4">
           <ul className="list-group">
             {listItems}
           </ul>
